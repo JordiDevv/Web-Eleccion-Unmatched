@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear usuario</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        form { display: inline-block; margin-top: 20px; text-align: center; }
+        .hidden { display: none; }
+        label, input { display: block; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Bienvenido al torneo de UNMATCHED!</h2>
+    <h3>Escribe tu login y ordena tus preferencias</h3>
+    <t>Puedes colocar un valor de 1 a 16, sin repetir, siendo 16 el mayor. En caso de indiferencia simplemente ignóralo<br></t>
+
+    <div id = "beforeAdvice">
+        <h3>Hey! Espera</h3>
+        <t>Antes de nada déjame hacerte un pequeño recordatorio sobre las normas que puede influir en tu decisión:<br><br></t>
+        <t>Una vez juegues un personaje su prioridad para ti bajará a 0<br></t>
+        <t>Sabemos que estás deseando jugar con Medusa pero la estrategia también es importante<br><br></t>
+        <button id="confirmAdvice">Que sí, pesao</button>
+    </div>
+
+    <form id="userForm">
+        <label for="nombre">Login:</label>
+        <input type="text" id="nombre" name="nombre" required>
+
+        <label for="alicia">Alicia:</label>
+        <input type="number" id="alicia" name="alicia" min="0" max="16" class="input-priority">
+
+        <label for="rey_arturo">Rey Arturo:</label>
+        <input type="number" id="rey_arturo" name="rey_arturo" min="0" max="16" class="input-priority">
+
+        <label for="medusa">Medusa:</label>
+        <input type="number" id="medusa" name="medusa" min="0" max="16" class="input-priority">
+        
+        <label for="simbad">Simbad:</label>
+        <input type="number" id="simbad" name="simbad" min="0" max="16" class="input-priority">
+
+        <label for="dracula">Drácula:</label>
+        <input type="number" id="dracula" name="dracula" min="0" max="16" class="input-priority">
+
+        <label for="jekyll_hyde">Jekyll & Hyde:</label>
+        <input type="number" id="jekyll_hyde" name="jekyll_hyde" min="0" max="16" class="input-priority">
+
+        <label for="sherlock">Sherlock:</label>
+        <input type="number" id="sherlock" name="sherlock" min="0" max="16" class="input-priority">
+
+        <label for="invisible">Invisible:</label>
+        <input type="number" id="invisible" name="invisible" min="0" max="16" class="input-priority">
+
+        <label for="caperucita">Caperucita:</label>
+        <input type="number" id="caperucita" name="caperucita" min="0" max="16" class="input-priority">
+
+        <label for="beowulf">Edad:</label>
+        <input type="number" id="beowulf" name="beowulf" min="0" max="16" class="input-priority">
+
+        <label for="aquiles">Aquiles:</label>
+        <input type="number" id="aquiles" name="aquiles" min="0" max="16" class="input-priority">
+
+        <label for="bloody_mary">Bloody Mary:</label>
+        <input type="number" id="bloody_mary" name="bloody_mary" min="0" max="16" class="input-priority">
+
+        <label for="sun_wukong">Sun Wukong:</label>
+        <input type="number" id="sun_wukong" name="sun_wukong" min="0" max="16" class="input-priority">
+
+        <label for="yennenga">Yennenga:</label>
+        <input type="number" id="yennenga" name="yennenga" min="0" max="16" class="input-priority">
+
+        <label for="houdini">Houdini:</label>
+        <input type="number" id="houdini" name="houdini" min="0" max="16" class="input-priority">
+
+        <label for="genio">Genio:</label>
+        <input type="number" id="genio" name="genio" min="0" max="16" class="input-priority">
+
+        <button type="submit">Registrar Usuario</button>
+    </form>
+
+    <button onclick="window.location.href='/index.html'">Lista de usuarios</button>
+
+    <script src="formLogic.js"></script>
+</body>
+</html>
