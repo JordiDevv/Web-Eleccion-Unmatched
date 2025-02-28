@@ -56,6 +56,8 @@ app.post('/users', (req, res) => {
     });
 });
 
+
+
 app.delete('/users/:id', (req, res) => {
     db.run("DELETE FROM users WHERE id = ?", req.params.id, function (err) {
         if (err) return res.status(500).json({ error: err.message });
