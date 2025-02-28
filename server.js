@@ -56,7 +56,25 @@ app.post('/users', (req, res) => {
     });
 });
 
+app.post('/check-inputs-calculator', (req, res) => {
+    const { inputs } = req.body;
 
+    const placeholders = inputs.map(() => "?").join(",");
+
+    const query = `SELECT nombre FROM users WHERE nombre IN (${placeholders})`;
+
+    db.all(query, inputs, (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+
+        if (rows.length === 4) {
+            res.json({ message: "Todos los nombres existen en la DB.", datos: rows });
+        } else {
+            res.status(400).json({ error: "Debes introducir nombres de usuarios creados." });
+        }
+    });
+});
 
 app.delete('/users/:id', (req, res) => {
     db.run("DELETE FROM users WHERE id = ?", req.params.id, function (err) {
