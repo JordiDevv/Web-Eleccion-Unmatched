@@ -58,9 +58,7 @@ app.post('/users', (req, res) => {
 
 app.post('/check-inputs-calculator', (req, res) => {
     const { inputs } = req.body;
-
     const placeholders = inputs.map(() => "?").join(",");
-
     const query = `SELECT nombre FROM users WHERE nombre IN (${placeholders})`;
 
     db.all(query, inputs, (err, rows) => {
@@ -73,6 +71,29 @@ app.post('/check-inputs-calculator', (req, res) => {
         } else {
             res.status(400).json({ error: "Debes introducir nombres de usuarios creados." });
         }
+    });
+});
+
+app.post("/calculate-prio", (req, res) => {
+    const { inputs } = req.body;
+    const herosRows = ["alicia", "rey_arturo", "medusa", "simbad", "dracula", 
+        "jekyll_hyde", "sherlock", "invisible", "caperucita", 
+        "beowulf", "aquiles", "bloody_mary", "sun_wukong", 
+        "yennenga", "houdini", "genio"];
+    const placeholders = inputs.map(() => "?").join(",");
+
+    const query = `SELECT nombre, ${herosRows.join(", ")} FROM users WHERE nombre IN (${placeholders})`;
+    db.all(query, inputs, (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+    
+        const results = rows.map(row => {
+            const values = herosRows.map(col => row[col]);
+            return { nombre: row.nombre, values };
+        });
+    
+        res.json({ result: results });
     });
 });
 

@@ -1,4 +1,7 @@
-document.getElementById("calculateForm").addEventListener("submit", async function(event) {
+document.getElementById("calculateForm").addEventListener("submit", checkInputs);
+
+async function checkInputs(event)
+{
     event.preventDefault();
 
     const inputs = [
@@ -16,22 +19,33 @@ document.getElementById("calculateForm").addEventListener("submit", async functi
     
     const inputsData = await inputsResponse.json();
     if (inputsResponse.ok) {
-        alert("Okey");
+        operation(inputs);
     } else {
-        alert(inputsData.error); // Muestra "Usuario no encontrado" si no coincide
+        alert(inputsData.error);
     }
-    
+}
 
-    // const response = await fetch("/calculator", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ nombres })
-    // });
-
-    // const data = await response.json();
+async function operation(inputs)
+{
+    const response = await fetch("/calculate-prio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inputs })
+    });
     
-    // if (response.ok)
-    //     document.getElementById("results").innerHTML = `<p>${JSON.stringify(data.resultado)}</p>`;
-    // else
-    //     alert("Error: " + data.error);
-});
+    const data = await response.json();
+    
+    if (response.ok)
+    {
+        const resultsContainer = document.getElementById("results");
+        resultsContainer.innerHTML = "";
+    
+        data.result.forEach(entry => {
+            const entryElement = document.createElement("p");
+            entryElement.textContent = `${entry.nombre}: ${entry.valores.join(", ")}`;
+            resultsContainer.appendChild(entryElement);
+        });
+    }
+    else
+        alert("Error: " + data.error);
+}
