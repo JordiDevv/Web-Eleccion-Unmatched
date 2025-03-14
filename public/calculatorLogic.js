@@ -37,33 +37,88 @@ async function operation(inputs)
     
     if (response.ok)
     {
-        const resultsContainer = document.getElementById("results");
-        resultsContainer.innerHTML = "";
-        const matchPool = new Map();
-    
-        data.result.forEach(entry => {
-            const maxPrio = calculateMaxPrio(entry);
-            matchPool.set(entry.nombre, entry.prio[maxPrio]);
-            // const entryElement = document.createElement("p");
-            // entryElement.textContent = `${entry.nombre}: ${entry.prio[maxPrio].hero} ${entry.prio[maxPrio].value} `;
-            // resultsContainer.appendChild(entryElement);
-        });
-
-        const matchPoolArray = Array.from(matchPool.values());
-        for (let i = 1; i < matchPoolArray.length; i++)
-        {
-            if (matchPoolArray[i].hero == matchPoolArray[i - 1].hero)
-                console.log("ok");
-        }
+        let assignedHeroes = assignHeroes(data.result);
+        showResults(assignedHeroes);
     }
     else
         alert("Error: " + data.error);
 }
 
-function calculateMaxPrio(entry)
+function assignHeroes(players)
 {
-    let indexMaxPrio = 0;
-    for (let i = 1; i < entry.prio.length; i++)
-        if (entry.prio[i].value > indexMaxPrio) indexMaxPrio = i;
-    return (indexMaxPrio);
+    players.sort((a, b) => Math.max(...b.prio.map(p => p.value)) - Math.max(...a.prio.map(p => p.value)));
+
+    const assignedHeroes = new Map();
+    const heroOwners = new Map();
+
+    players.forEach(player =>
+    {
+        let assigned = false;
+        let availablePriorities = [...player.prio];
+        
+        while (!assigned && availablePriorities.length > 0) 
+        {
+            availablePriorities.sort((a, b) => b.value - a.value);
+            let bestChoice = availablePriorities[0];
+
+            if (heroOwners.has(bestChoice.hero)) 
+            {
+                let currentOwner = heroOwners.get(bestChoice.hero);
+                
+                if (currentOwner.value === bestChoice.value) 
+                {
+                    let winner = Math.random() < 0.5 ? player.nombre : currentOwner.owner;
+                    let loser = winner === player.nombre ? currentOwner.owner : player.nombre;
+
+                    assignedHeroes.set(winner, bestChoice.hero);
+                    heroOwners.set(bestChoice.hero, { owner: winner, value: bestChoice.value });
+
+                    player = players.find(p => p.nombre === loser);
+                }
+                else if (currentOwner.value < bestChoice.value)
+                {
+                    assignedHeroes.set(player.nombre, bestChoice.hero);
+                    heroOwners.set(bestChoice.hero, { owner: player.nombre, value: bestChoice.value });
+
+                    let previousOwner = players.find(p => p.nombre === currentOwner.owner);
+                    previousOwner.prio = previousOwner.prio.filter(h => h.hero !== bestChoice.hero);
+                    player = previousOwner;
+                }
+                else
+                    availablePriorities.shift();
+            }
+            else
+            {
+                assignedHeroes.set(player.nombre, bestChoice.hero);
+                heroOwners.set(bestChoice.hero, { owner: player.nombre, value: bestChoice.value });
+                assigned = true;
+            }
+        }
+    });
+
+    players.forEach(player => {
+        let assignedHero = assignedHeroes.get(player.nombre);
+        let assignedPrio = player.prio.find(p => p.hero === assignedHero);
+
+        if (assignedPrio)
+        {
+            if (assignedPrio.value > 0) assignedPrio.value = 0;
+            else assignedPrio.value -= 1;
+        }
+    });
+
+    return assignedHeroes;
+}
+
+function showResults(assignedHeroes)
+{
+    const resultsContainer = document.getElementById("results"); 
+    resultsContainer.innerHTML = "";
+
+    for (const [player, hero] of assignedHeroes)
+    {
+        const entryElement = document.createElement("p"); 
+        entryElement.textContent = `${player} juega con ${hero}`;
+        resultsContainer.appendChild(entryElement);
+    }
 }
