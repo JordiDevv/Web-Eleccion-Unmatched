@@ -89,8 +89,11 @@ app.post("/calculate-prio", (req, res) => {
         }
     
         const results = rows.map(row => {
-            const values = herosRows.map(col => row[col]);
-            return { nombre: row.nombre, values };
+            const prio = herosRows.map(col => ({
+                hero: col,
+                value: row[col]
+            }));
+            return { nombre: row.nombre, prio };
         });
     
         res.json({ result: results });

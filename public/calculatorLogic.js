@@ -39,13 +39,31 @@ async function operation(inputs)
     {
         const resultsContainer = document.getElementById("results");
         resultsContainer.innerHTML = "";
+        const matchPool = new Map();
     
         data.result.forEach(entry => {
-            const entryElement = document.createElement("p");
-            entryElement.textContent = `${entry.nombre}: ${entry.valores.join(", ")}`;
-            resultsContainer.appendChild(entryElement);
+            const maxPrio = calculateMaxPrio(entry);
+            matchPool.set(entry.nombre, entry.prio[maxPrio]);
+            // const entryElement = document.createElement("p");
+            // entryElement.textContent = `${entry.nombre}: ${entry.prio[maxPrio].hero} ${entry.prio[maxPrio].value} `;
+            // resultsContainer.appendChild(entryElement);
         });
+
+        const matchPoolArray = Array.from(matchPool.values());
+        for (let i = 1; i < matchPoolArray.length; i++)
+        {
+            if (matchPoolArray[i].hero == matchPoolArray[i - 1].hero)
+                console.log("ok");
+        }
     }
     else
         alert("Error: " + data.error);
+}
+
+function calculateMaxPrio(entry)
+{
+    let indexMaxPrio = 0;
+    for (let i = 1; i < entry.prio.length; i++)
+        if (entry.prio[i].value > indexMaxPrio) indexMaxPrio = i;
+    return (indexMaxPrio);
 }
