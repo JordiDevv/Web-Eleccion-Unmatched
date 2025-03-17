@@ -100,6 +100,24 @@ app.post("/calculate-prio", (req, res) => {
     });
 });
 
+app.post("/update-priorities", (req, res) => {
+    const updates = req.body.updates;
+    
+    const updatePromises = updates.map(update => {
+        return new Promise((resolve, reject) => {
+            const query = `UPDATE users SET ${update.hero} = ? WHERE nombre = ?`;
+            db.run(query, [update.newValue, update.nombre], function (err) {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    });
+
+    Promise.all(updatePromises)
+        .then(() => res.json({ success: true }))
+        .catch(err => res.status(500).json({ error: err.message }));
+});
+
 app.delete('/users/:id', (req, res) => {
     db.run("DELETE FROM users WHERE id = ?", req.params.id, function (err) {
         if (err) return res.status(500).json({ error: err.message });

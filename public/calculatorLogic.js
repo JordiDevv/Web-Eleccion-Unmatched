@@ -38,6 +38,7 @@ async function operation(inputs)
     if (response.ok)
     {
         let assignedHeroes = assignHeroes(data.result);
+        updateDatabase(assignedHeroes, data.result);
         showResults(assignedHeroes);
     }
     else
@@ -61,11 +62,28 @@ function assignHeroes(players)
             availablePriorities.sort((a, b) => b.value - a.value);
             let bestChoice = availablePriorities[0];
 
+            if (!bestChoice)
+            {
+                availablePriorities.shift();
+                continue;
+            }
+
             if (heroOwners.has(bestChoice.hero)) 
             {
                 let currentOwner = heroOwners.get(bestChoice.hero);
                 
-                if (currentOwner.value === bestChoice.value) 
+                if (currentOwner.value < bestChoice.value)
+                {
+                    assignedHeroes.set(player.nombre, bestChoice.hero);
+                    heroOwners.set(bestChoice.hero, { owner: player.nombre, value: bestChoice.value });
+
+                    let previousOwner = players.find(p => p.nombre === currentOwner.owner);
+                    previousOwner.prio = previousOwner.prio.filter(h => h.hero !== bestChoice.hero);
+                    
+                    availablePriorities = previousOwner.prio;
+                    player = previousOwner;
+                }
+                else if (currentOwner.value === bestChoice.value) 
                 {
                     let winner = Math.random() < 0.5 ? player.nombre : currentOwner.owner;
                     let loser = winner === player.nombre ? currentOwner.owner : player.nombre;
@@ -73,16 +91,9 @@ function assignHeroes(players)
                     assignedHeroes.set(winner, bestChoice.hero);
                     heroOwners.set(bestChoice.hero, { owner: winner, value: bestChoice.value });
 
-                    player = players.find(p => p.nombre === loser);
-                }
-                else if (currentOwner.value < bestChoice.value)
-                {
-                    assignedHeroes.set(player.nombre, bestChoice.hero);
-                    heroOwners.set(bestChoice.hero, { owner: player.nombre, value: bestChoice.value });
-
-                    let previousOwner = players.find(p => p.nombre === currentOwner.owner);
-                    previousOwner.prio = previousOwner.prio.filter(h => h.hero !== bestChoice.hero);
-                    player = previousOwner;
+                    let loserPlayer = players.find(p => p.nombre === loser);
+                    loserPlayer.prio = loserPlayer.prio.filter(h => h.hero !== bestChoice.hero);
+                    availablePriorities = loserPlayer.prio;
                 }
                 else
                     availablePriorities.shift();
@@ -101,13 +112,41 @@ function assignHeroes(players)
         let assignedPrio = player.prio.find(p => p.hero === assignedHero);
 
         if (assignedPrio)
-        {
-            if (assignedPrio.value > 0) assignedPrio.value = 0;
-            else assignedPrio.value -= 1;
-        }
+            assignedPrio.value = assignedPrio.value > 0 ? 0 : assignedPrio.value -= 1;
     });
 
     return assignedHeroes;
+}
+
+function updateDatabase(assignedHeroes, players)
+{
+    const updates = [];
+
+    players.forEach(player => {
+        let assignedHero = assignedHeroes.get(player.nombre);
+        let assignedPrio = player.prio.find(p => p.hero === assignedHero);
+
+        if (assignedPrio)
+        {
+            let newValue = assignedPrio.value;
+            updates.push({ nombre: player.nombre, hero: assignedHero, newValue });
+        }
+    });
+
+    fetch("/update-priorities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ updates })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log("Base de datos actualizada correctamente");
+        } else {
+            console.error("Error al actualizar la base de datos:", data.error);
+        }
+    })
+    .catch(error => console.error("Error en la petición:", error));
 }
 
 function showResults(assignedHeroes)
