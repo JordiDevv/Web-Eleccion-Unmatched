@@ -47,89 +47,83 @@ async function operation(inputs)
 
 function assignHeroes(players)
 {
-    players.sort((a, b) => Math.max(...b.prio.map(p => p.value)) - Math.max(...a.prio.map(p => p.value)));
+    let assignedHeroes = new Map();
+    let conflictExists = true;
 
-    const assignedHeroes = new Map();
-    const heroOwners = new Map();
-
-    players.forEach(player =>
+    while (conflictExists)
     {
-        let assigned = false;
-        let availablePriorities = [...player.prio];
-        
-        while (!assigned && availablePriorities.length > 0) 
+        let heroOccurrences = new Map();
+        conflictExists = false;
+
+        players.forEach(player =>
         {
-            availablePriorities.sort((a, b) => b.value - a.value);
-            let bestChoice = availablePriorities[0];
-
-            if (!bestChoice)
+            if (!assignedHeroes.has(player.nombre))
             {
-                availablePriorities.shift();
-                continue;
+                let bestChoice = player.prio.reduce((max, current) =>
+                    current.value > max.value ? current : max
+                );
+
+                assignedHeroes.set(player.nombre, { hero: bestChoice.hero, value: bestChoice.value });
+
+                if (!heroOccurrences.has(bestChoice.hero))
+                    heroOccurrences.set(bestChoice.hero, []);
+                heroOccurrences.get(bestChoice.hero).push({ player, value: bestChoice.value });
             }
+        });
 
-            if (heroOwners.has(bestChoice.hero)) 
+        heroOccurrences.forEach((playersList, hero) =>
+        {
+            if (playersList.length > 1)
             {
-                let currentOwner = heroOwners.get(bestChoice.hero);
-                
-                if (currentOwner.value < bestChoice.value)
+                conflictExists = true;
+
+                playersList.sort((a, b) => b.value - a.value);
+
+                for (let i = 1; i < playersList.length; i++)
                 {
-                    assignedHeroes.set(player.nombre, bestChoice.hero);
-                    heroOwners.set(bestChoice.hero, { owner: player.nombre, value: bestChoice.value });
+                    let loser = playersList[i];
 
-                    let previousOwner = players.find(p => p.nombre === currentOwner.owner);
-                    previousOwner.prio = previousOwner.prio.filter(h => h.hero !== bestChoice.hero);
-                    
-                    availablePriorities = previousOwner.prio;
-                    player = previousOwner;
+                    let nextHero = loser.player.prio
+                        .filter(h => !Array.from(assignedHeroes.values()).some(a => a.hero === h.hero))
+                        .reduce((max, current) => current.value > max.value ? current : max, { value: -Infinity });
+
+                    if (nextHero.value !== -Infinity)
+                        assignedHeroes.set(loser.player.nombre, { hero: nextHero.hero, value: nextHero.value });
+                    else
+                        assignedHeroes.delete(loser.player.nombre);
                 }
-                else if (currentOwner.value === bestChoice.value) 
-                {
-                    let winner = Math.random() < 0.5 ? player.nombre : currentOwner.owner;
-                    let loser = winner === player.nombre ? currentOwner.owner : player.nombre;
-
-                    assignedHeroes.set(winner, bestChoice.hero);
-                    heroOwners.set(bestChoice.hero, { owner: winner, value: bestChoice.value });
-
-                    let loserPlayer = players.find(p => p.nombre === loser);
-                    loserPlayer.prio = loserPlayer.prio.filter(h => h.hero !== bestChoice.hero);
-                    availablePriorities = loserPlayer.prio;
-                }
-                else
-                    availablePriorities.shift();
             }
-            else
-            {
-                assignedHeroes.set(player.nombre, bestChoice.hero);
-                heroOwners.set(bestChoice.hero, { owner: player.nombre, value: bestChoice.value });
-                assigned = true;
-            }
-        }
+        });
+    }
+    
+    assignedHeroes.forEach((data, playerName) => 
+    {
+        if (data.value > 0)
+            assignedHeroes.set(playerName, { hero: data.hero, value: 0 });
+        else
+            assignedHeroes.set(playerName, { hero: data.hero, value: data.value - 1 });
     });
-
-    players.forEach(player => {
-        let assignedHero = assignedHeroes.get(player.nombre);
-        let assignedPrio = player.prio.find(p => p.hero === assignedHero);
-
-        if (assignedPrio)
-            assignedPrio.value = assignedPrio.value > 0 ? 0 : assignedPrio.value -= 1;
-    });
-
+    
     return assignedHeroes;
+        
 }
 
 function updateDatabase(assignedHeroes, players)
 {
     const updates = [];
 
-    players.forEach(player => {
+    players.forEach(player =>
+    {
         let assignedHero = assignedHeroes.get(player.nombre);
-        let assignedPrio = player.prio.find(p => p.hero === assignedHero);
-
-        if (assignedPrio)
+        
+        if (assignedHero)
         {
-            let newValue = assignedPrio.value;
-            updates.push({ nombre: player.nombre, hero: assignedHero, newValue });
+            updates.push
+            ({
+                nombre: player.nombre,
+                hero: assignedHero.hero,
+                newValue: assignedHero.value
+            });
         }
     });
 
@@ -157,7 +151,7 @@ function showResults(assignedHeroes)
     for (const [player, hero] of assignedHeroes)
     {
         const entryElement = document.createElement("p"); 
-        entryElement.textContent = `${player} juega con ${hero}`;
+        entryElement.textContent = `${player} juega con ${hero.hero}`;
         resultsContainer.appendChild(entryElement);
     }
 }
