@@ -79,10 +79,19 @@ function assignHeroes(players)
 
                 playersList.sort((a, b) => b.value - a.value);
 
-                for (let i = 1; i < playersList.length; i++)
-                {
-                    let loser = playersList[i];
+                let highestValue = playersList[0].value;
+                let candidates = playersList.filter(p => p.value === highestValue);
 
+                let winner = candidates.length > 1 
+                    ? candidates[Math.floor(Math.random() * candidates.length)]
+                    : candidates[0];
+
+                assignedHeroes.set(winner.player.nombre, { hero, value: highestValue });
+
+                playersList = playersList.filter(p => p !== winner);
+
+                playersList.forEach(loser => 
+                {
                     let nextHero = loser.player.prio
                         .filter(h => !Array.from(assignedHeroes.values()).some(a => a.hero === h.hero))
                         .reduce((max, current) => current.value > max.value ? current : max, { value: -Infinity });
@@ -91,9 +100,9 @@ function assignHeroes(players)
                         assignedHeroes.set(loser.player.nombre, { hero: nextHero.hero, value: nextHero.value });
                     else
                         assignedHeroes.delete(loser.player.nombre);
-                }
+                })
             }
-        });
+        })
     }
     
     assignedHeroes.forEach((data, playerName) => 
