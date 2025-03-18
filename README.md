@@ -42,4 +42,4 @@ El proyecto cuenta con varias rutas para la interacción con el servidor:
 💾 Actualiza la base de datos con las nuevas prioridades de los jugadores.
 
 ## 👨‍💻 Autor
-Este proyecto fue desarrollado por Jorge Sanz -> [JordiDevv](https://github.com/JordiDevv.com)
+Este proyecto fue desarrollado por **Jorge Sanz** -> [JordiDevv](https://github.com/JordiDevv)
