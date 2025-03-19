@@ -56,21 +56,28 @@ app.post('/users', (req, res) => {
     });
 });
 
-app.post('/check-inputs-calculator', (req, res) => {
-    const { inputs } = req.body;
-    const placeholders = inputs.map(() => "?").join(",");
-    const query = `SELECT nombre FROM users WHERE nombre IN (${placeholders})`;
+app.post('/get-players', (req, res) =>
+{
+    const herosRows = ["alicia", "rey_arturo", "medusa", "simbad", "dracula", 
+        "jekyll_hyde", "sherlock", "invisible", "caperucita", 
+        "beowulf", "aquiles", "bloody_mary", "sun_wukong", 
+        "yennenga", "houdini", "genio"];
 
-    db.all(query, inputs, (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-
-        if (rows.length === 4) {
-            res.json({ message: "Todos los nombres existen en la DB.", datos: rows });
-        } else {
-            res.status(400).json({ error: "Debes introducir nombres de usuarios creados." });
-        }
+    db.all("SELECT * FROM users", [], (err, rows) =>
+    {
+        if (err) return res.status(500).json({ error: err.message });
+    
+        const results = rows.map(row =>
+        {
+            const prio = herosRows.map(col =>
+            ({
+                hero: col,
+                value: row[col]
+            }));
+            return { nombre: row.nombre, prio };
+        });
+    
+        res.json({ result: results });
     });
 });
 

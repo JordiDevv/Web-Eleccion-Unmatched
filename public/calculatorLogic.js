@@ -1,40 +1,17 @@
-document.getElementById("calculateForm").addEventListener("submit", checkInputs);
+document.getElementById("calcButton").addEventListener("click", operation);
 
-async function checkInputs(event)
+async function operation(event)
 {
     event.preventDefault();
 
-    const inputs = [
-        document.getElementById("player1").value.trim(),
-        document.getElementById("player2").value.trim(),
-        document.getElementById("player3").value.trim(),
-        document.getElementById("player4").value.trim()
-    ];
-
-    const inputsResponse = await fetch("/check-inputs-calculator", {
+    const response = await fetch("/get-players",
+    {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inputs })
     });
-    
-    const inputsData = await inputsResponse.json();
-    if (inputsResponse.ok) {
-        operation(inputs);
-    } else {
-        alert(inputsData.error);
-    }
-}
 
-async function operation(inputs)
-{
-    const response = await fetch("/calculate-prio", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inputs })
-    });
-    
     const data = await response.json();
-    
+
     if (response.ok)
     {
         let assignedHeroes = assignHeroes(data.result);
