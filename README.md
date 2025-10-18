@@ -30,12 +30,12 @@ Permite registrar usuarios con preferencias y luego calcular asignaciones, resol
 1. Clona el repositorio  
    git clone https://github.com/JordiDevv/Web-Eleccion-Unmatched.git  
    cd Web-Eleccion-Unmatched
-2. Instala dependencias
-   npm install
-3. Inicializa la base de datos
-   sqlite3 users.db < CreateTable.sql
-4. Ejecuta la aplicación
-5. Abre tu navegador en http://localhost:8000 (o el puerto indicado) para ver la interfaz o usar la API.
+2. Instala dependencias  
+   npm install  
+3. Inicializa la base de datos  
+   sqlite3 users.db < CreateTable.sql  
+4. Ejecuta la aplicación  
+5. Abre tu navegador en http://localhost:8000 (o el puerto indicado) para ver la interfaz o usar la API.  
 
 ---
 
