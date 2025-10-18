@@ -66,7 +66,7 @@ Validación de datos, errores y rutas HTTP
 
 🧑 Autor y contacto
 
-Desarrollado por Jorge Sanz (JordiDevv)
-GitHub: [JordiDevv](https://github.com/JordiDevv)
-Contacto: [jordidevv@gmail.com](mailto:jordidevv@gmail.com)
-LinkedIn: [Jorge Sanz](https://www.linkedin.com/in/jordidevv/)
+Desarrollado por Jorge Sanz (JordiDevv)  
+GitHub: [JordiDevv](https://github.com/JordiDevv)  
+Contacto: [jordidevv@gmail.com](mailto:jordidevv@gmail.com)  
+LinkedIn: [Jorge Sanz](https://www.linkedin.com/in/jordidevv/)  
