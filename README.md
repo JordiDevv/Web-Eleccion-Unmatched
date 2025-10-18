@@ -50,7 +50,7 @@ POST /update-database — Guarda las prioridades resultantes en la base de datos
 
 📸 Demo
 
-[Demo técina](./demo.gif)
+![Demo técina](./demo.gif)
 
 ---
 
