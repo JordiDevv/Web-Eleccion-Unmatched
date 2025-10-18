@@ -35,6 +35,7 @@ Permite registrar usuarios con preferencias y luego calcular asignaciones, resol
 3. Inicializa la base de datos  
    sqlite3 users.db < CreateTable.sql  
 4. Ejecuta la aplicación  
+   npm start  
 5. Abre tu navegador en http://localhost:8000 (o el puerto indicado) para ver la interfaz o usar la API.  
 
 ---
